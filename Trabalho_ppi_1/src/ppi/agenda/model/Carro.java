@@ -2,23 +2,19 @@ package ppi.agenda.model;
 
 public class Carro {
 	
-	private int id;
+	private long renavan;
 	private String modelo;
 	private String categoria;
-	private String renavan;
 	private String anoFabricacao;
 	private double tarifaDia;
-	private int disponivel;
+
 	
 	
-	public int getId() {
-		return id;
+	
+	public void setRenavan(long renavan) {
+		this.renavan = renavan;
 	}
-	
-	public void setId(int id) {
-		this.id = id;
-	}
-	
+
 	public String getModelo() {
 		return modelo;
 	}
@@ -35,13 +31,6 @@ public class Carro {
 		this.categoria = categoria;
 	}
 	
-	public String getRenavan() {
-		return renavan;
-	}
-	
-	public void setRenavan(String renavan) {
-		this.renavan = renavan;
-	}
 	
 	public String getAnoFabricacao() {
 		return anoFabricacao;
@@ -59,12 +48,6 @@ public class Carro {
 		this.tarifaDia = tarifaDia;
 	}
 
-	public int getDisponivel() {
-		return disponivel;
-	}
 
-	public void setDisponivel(int disponivel) {
-		this.disponivel = disponivel;
-	}
-	
+
 }
