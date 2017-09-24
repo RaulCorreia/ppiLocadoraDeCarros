@@ -20,7 +20,7 @@ public class ListarCarros implements Logica{
 		
 		// mostrar todos os carros disponiveis
 		if(tipo.equals("all")) {
-			List<Carro> carros =  carro.getObterListaCarrosCompleta();
+			List<Carro> carros =  carro.obterListaCarrosCompleta();
 			
 			req.setAttribute("carros", carros);
 			return "carrosDisponiveis.jsp";
@@ -31,15 +31,9 @@ public class ListarCarros implements Logica{
 			 req.setAttribute("carros", carros);
 			 return "listagemcarrosquantidade.jsp";
 
-			 // listar carros por categoria
-
-		} else {
-			List<Carro> carros = carro.getobterDisponivel(tipo);
-			 req.setAttribute("carros", carros);
-			 return "confirmarReserva.jsp";
-
-			
 		}
+		
+		
+		return null;
 	}
-
 }
