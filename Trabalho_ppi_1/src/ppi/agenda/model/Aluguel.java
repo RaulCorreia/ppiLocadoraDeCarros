@@ -12,7 +12,8 @@ public class Aluguel {
 	
 	private int id;
 	private int idDoCliente;
-	private int idDoCarro;
+	private long renavanDoCarro;
+	
 	private Calendar dataInicioAluguel;
 	private Calendar dataFinalAluguel;
 	private double tarifaBase;
@@ -21,17 +22,8 @@ public class Aluguel {
 	private String nomeCliente;
 	private String cpfCliente;
 	private String modeloDoCarro;
-
 	
-	private String renavanDoCarro;
 
-	public String getRenavanDoCarro() {
-		return renavanDoCarro;
-	}
-
-	public void setRenavanDoCarro(String renavanDoCarro) {
-		this.renavanDoCarro = renavanDoCarro;
-	}
 	
 
 	
@@ -51,12 +43,13 @@ public class Aluguel {
 		this.idDoCliente = idDoCliente;
 	}
 
-	public int getIdDoCarro() {
-		return idDoCarro;
+	
+	public long getRenavanDoCarro() {
+		return renavanDoCarro;
 	}
 
-	public void setIdDoCarro(int idDoCarro) {
-		this.idDoCarro = idDoCarro;
+	public void setRenavanDoCarro(long renavanDoCarro) {
+		this.renavanDoCarro = renavanDoCarro;
 	}
 
 	public Calendar getDataInicioAluguel() {
@@ -117,9 +110,11 @@ public class Aluguel {
 	public void setModeloDoCarro(String modeloDoCarro) {
 		this.modeloDoCarro = modeloDoCarro;
 	}
+	
+	
+	
+	
 
-	
-	
 	public double gerarValorTotal(Calendar dataFinalDevolucao) {
 		
 		
@@ -141,7 +136,7 @@ public class Aluguel {
 			int diasDeAtraso = Days.daysBetween(dataFinal, dataDaDevolucao).getDays();
 			
 			// Calcula a taxa de atrasp
-			//Taxa de Atraso � 30% do valor total vezes a quantidade de dias de atraso
+			//Taxa de Atraso é 30% do valor total vezes a quantidade de dias de atraso
 			//							30% da Tarifa correta			X	Dias de atraso
 			double taxaDeAtraso = ((this.tarifaBase * diasCorridos) * 0.30) * diasDeAtraso;
 			
@@ -156,7 +151,7 @@ public class Aluguel {
 		diasCorretos = ( this.dataFinalAluguel.getTimeInMillis() - this.dataInicioAluguel.getTimeInMillis() ) / MILLIS_IN_DAY;
 		
 		
-		// Testa se a data passada na hora de devolver � igual a data que foi dita no momento de alugar
+		// Testa se a data passada na hora de devolver é igual a data que foi dita no momento de alugar
 		if(dataFinalDevolucao == this.dataFinalAluguel) {
 			
 			tarifaFinal = tarifaBase * diasCorretos;
@@ -258,7 +253,7 @@ public class Aluguel {
 	// Recebe a data do Sql e insere no formado Calendar
 	public void setDataInicioAluguelFromSQL(Date dataInicioAluguel) {
 
-		// montando a data atrav�s do Calendar
+		// montando a data através do Calendar
 		Calendar data = Calendar.getInstance();
 		data.setTime(dataInicioAluguel);
 		this.dataInicioAluguel = data;
@@ -278,7 +273,7 @@ public class Aluguel {
 	// Recebe a data do Sql e insere no formado Calendar
 	public void setDataFinalAluguelFromSQL(Date dataFinalAluguel) {
 
-		// montando a data atrav�s do Calendar
+		// montando a data através do Calendar
 		Calendar data = Calendar.getInstance();
 		data.setTime(dataFinalAluguel);
 		this.dataFinalAluguel = data;
