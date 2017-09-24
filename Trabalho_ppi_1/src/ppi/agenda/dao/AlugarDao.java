@@ -43,7 +43,7 @@ public class AlugarDao {
 				Aluguel novoAluguel = new Aluguel();
 
 				novoAluguel.setId(rs.getInt("id"));
-				novoAluguel.setIdDoCarro(rs.getInt("idDoCarro"));
+				novoAluguel.setRenavanDoCarro(rs.getLong("renavanDoCarro"));
 				novoAluguel.setIdDoCliente(rs.getInt("idDoCliente"));
 				novoAluguel.setDataInicioAluguelFromSQL(rs.getDate("dataInicioAluguel"));
 				novoAluguel.setDataFinalAluguelFromSQL(rs.getDate("dataFinalAluguel"));
@@ -86,7 +86,7 @@ public class AlugarDao {
 			if(rs.next()) {
 
 				novoAluguel.setId(rs.getInt("id"));
-				novoAluguel.setIdDoCarro(rs.getInt("idDoCarro"));
+				novoAluguel.setRenavanDoCarro(rs.getInt("renavanDoCarro"));
 				novoAluguel.setIdDoCliente(rs.getInt("idDoCliente"));
 				novoAluguel.setDataInicioAluguelFromSQL(rs.getDate("dataInicioAluguel"));
 				novoAluguel.setDataFinalAluguelFromSQL(rs.getDate("dataFinalAluguel"));
@@ -107,13 +107,13 @@ public class AlugarDao {
 				novoAluguel.setCpfCliente(rs.getString("cpf"));
 				
 				//Acessa o banco de carros para obter a info do modelo
-				stmt = this.connection.prepareStatement("SELECT modelo, renavan FROM carros WHERE ID = ?");
-				stmt.setInt(1, novoAluguel.getIdDoCarro());
+				stmt = this.connection.prepareStatement("SELECT modelo FROM carros WHERE RENAVAN = ?");
+				stmt.setLong(1, novoAluguel.getRenavanDoCarro());
 				rs = stmt.executeQuery();
 				
 				rs.next();
 				novoAluguel.setModeloDoCarro(rs.getString("modelo"));
-				novoAluguel.setModeloDoCarro(rs.getString("renavan"));
+
 				
 
 
@@ -134,16 +134,14 @@ public class AlugarDao {
 	
 	// SETTERs
 	
-	public int alugaCarro(int idDoCarro, int idDoCliente, String dataInicioAluguel, String dataFinalAluguel, double tarifaBase) {
+	public int alugaCarro(long renavanDoCarro, int idDoCliente, String dataInicioAluguel, String dataFinalAluguel, double tarifaBase) {
 		
 		int idTransacao = -1;
 		
 		Aluguel novoAluguel = new Aluguel();
 		
 		
-		System.out.println(idDoCarro+" "+ idDoCliente+" "+ dataInicioAluguel+" "+ dataFinalAluguel+" "+tarifaBase);
-		
-		novoAluguel.setIdDoCarro(idDoCarro);
+		novoAluguel.setRenavanDoCarro(renavanDoCarro);
 		novoAluguel.setIdDoCliente(idDoCliente);
 		novoAluguel.setDataInicioAluguelString(dataInicioAluguel);
 		novoAluguel.setDataFinalAluguelString(dataFinalAluguel);
@@ -154,7 +152,7 @@ public class AlugarDao {
 		
 		// Obtem o carro para saber se tem disponivel
 		// Apenas um tratamento no back
-		Carro carro = new CarrosDao().obterCarro(idDoCarro);
+		Carro carro = new CarrosDao().obterCarro(renavanDoCarro);
 		
 		
 		
@@ -165,23 +163,19 @@ public class AlugarDao {
 			PreparedStatement stmt;
 
 			// Cria o registro 
-			stmt = this.connection.prepareStatement("INSERT INTO aluguel(idDoCliente, idDoCarro, dataInicioAluguel, dataFinalAluguel, tarifaBase) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-			stmt.setInt(2, novoAluguel.getIdDoCarro());
+			stmt = this.connection.prepareStatement("INSERT INTO aluguel(idDoCliente, renavanDoCarro, dataInicioAluguel, dataFinalAluguel, tarifaBase) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 			stmt.setInt(1, novoAluguel.getIdDoCliente());
+			stmt.setLong(2, novoAluguel.getRenavanDoCarro());
 			stmt.setDate(3, novoAluguel.getDataInicioAluguelToSQL());
 			stmt.setDate(4, novoAluguel.getDataFinalAluguelToSQL());
 			stmt.setDouble(5, novoAluguel.getTarifaBase());
 
 			int ok = stmt.executeUpdate();
-			System.out.println("CARRO");
-			System.out.println(novoAluguel.getIdDoCarro());
-			System.out.println(novoAluguel.getIdDoCliente());
-
 			
 			
-			stmt =  this.connection.prepareStatement("select * from aluguel where idDoCliente = ? and idDoCarro = ? ; ");
+			stmt =  this.connection.prepareStatement("select * from aluguel where idDoCliente = ? and renavanDoCarro = ? ; ");
 			stmt.setInt(1, novoAluguel.getIdDoCliente());
-			stmt.setInt(2, novoAluguel.getIdDoCarro());
+			stmt.setLong(2, novoAluguel.getRenavanDoCarro());
 
 
 			//Recupera o ID da transacao recem gerado
@@ -225,19 +219,19 @@ public class AlugarDao {
 			ResultSet rs;
 			
 			//SELECT idDoCarro FROM alugueis WHERE ID = ?");
-			stmt = this.connection.prepareStatement("SELECT id, quantidadeDisponivel  FROM carros WHERE ID = (SELECT idDoCarro FROM alugueis WHERE ID = ?)");
+			stmt = this.connection.prepareStatement("SELECT renavan, quantidadeDisponivel  FROM carros WHERE RENAVAN = (SELECT renavanDOCarro FROM alugueis WHERE ID = ?)");
 			stmt.setInt(1, idTransacao);
 			rs = stmt.executeQuery();
 
 			if(rs.next()) {
 
 				
-				int idDoCarro = rs.getInt("id");
+				long renavanDoCarro = rs.getInt("renavanDoCarro");
 				int quantidadeDisponivel = rs.getInt("quantidadeDisponivel");
 				
-				stmt = this.connection.prepareStatement("UPDATE carros SET quantidadeDisponivel = ? WHERE ID = ?");
+				stmt = this.connection.prepareStatement("UPDATE carros SET quantidadeDisponivel = ? WHERE renavan = ?");
 				stmt.setInt(1, (quantidadeDisponivel + 1));
-				stmt.setInt(2, idDoCarro);
+				stmt.setLong(2, renavanDoCarro);
 				stmt.executeUpdate();
 				
 						
