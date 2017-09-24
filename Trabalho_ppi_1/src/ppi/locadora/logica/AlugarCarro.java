@@ -48,11 +48,11 @@ public class AlugarCarro implements Logica {
 		int idCliente = cliente.adicionaCliente(clientenovo);
 		clientenovo.setId(idCliente);
 
-		Carro carro = new CarrosDao().obterCarro(Integer.parseInt(carroSelect));
+		Carro carro = new CarrosDao().obterCarro(Long.parseLong(carroSelect));
 
 		AlugarDao alugar = new AlugarDao();
 
-		int idAluguel = alugar.alugaCarro(Integer.parseInt(carroSelect), idCliente, dados[0], dados[2],
+		int idAluguel = alugar.alugaCarro(Long.parseLong(carroSelect), idCliente, dados[0], dados[2],
 				carro.getTarifaDia());
 
 		req.setAttribute("idCliente", idCliente);
