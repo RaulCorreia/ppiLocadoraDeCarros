@@ -113,7 +113,7 @@ public class ClientesDao {
 	
 	
 	
-public int adicionaCliente(Cliente novoCliente) {
+	public int adicionaCliente(Cliente novoCliente) {
 		
 		
 		try {
@@ -153,10 +153,103 @@ public int adicionaCliente(Cliente novoCliente) {
 			System.out.println("Erro ao inserir novo cliente");
 			System.out.println(e.getMessage());
 		}
+		
 		return 0;
-		
-		
-		
-		
 	}
+	
+	
+	
+	
+	public boolean excluirCliente(int idDoCliente) {
+		
+		
+		List<Aluguel> alugueis = new ArrayList<Aluguel>();
+		boolean existeAlugueisImpedindo = false;
+		
+		try {
+			
+			
+			PreparedStatement stmt = this.connection.prepareStatement("SELECT FROM alugueis WHERE idDoCliente = ?");
+			stmt.setInt(1, idDoCliente);
+			
+			
+			ResultSet rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				
+				Aluguel novoAluguel = new Aluguel();
+
+				novoAluguel.setId(rs.getInt("id"));
+				novoAluguel.setRenavanDoCarro(rs.getLong("renavanDoCarro"));
+				novoAluguel.setIdDoCliente(rs.getInt("idDoCliente"));
+				novoAluguel.setDataInicioAluguelFromSQL(rs.getDate("dataInicioAluguel"));
+				novoAluguel.setDataFinalAluguelFromSQL(rs.getDate("dataFinalAluguel"));
+				novoAluguel.setTarifaBase(rs.getDouble("tarifaBase"));
+				
+				
+				
+				DateTime dataInicioAluguel = new DateTime(novoAluguel.getDataInicioAluguel());
+				DateTime dataFinalAluguel = new DateTime(novoAluguel.getDataFinalAluguel());
+				
+				Calendar hoje = Calendar.getInstance();
+				DateTime dataDeExcluirUsuario = new DateTime(hoje);
+				
+				// Se existir algum aluguel e a data de excluir nao estiver entre as datas de inicio e fim do alguel
+				// é possivel deletar o cliente e os alugueis, entao adiciona na lista
+				// Se nao adicionou nenhum
+				if( !( dataDeExcluirUsuario.isAfter(dataInicioAluguel) && dataDeExcluirUsuario.isBefore(dataFinalAluguel) ) && 
+						!( dataDeExcluirUsuario.isEqual(dataInicioAluguel) || dataDeExcluirUsuario.isEqual(dataFinalAluguel)) ){
+					
+					alugueis.add(novoAluguel);
+					
+				} else {
+					existeAlugueisImpedindo = true;
+				}
+				
+			
+			}
+			
+			
+			// Se nao tiver nenhum aluguel impedindo
+			// Exclui o usuario e os alugueis se tiver
+			if(!existeAlugueisImpedindo) {
+				
+				
+				//Aqui seria se tiver algum aluguel que nao impede o delete do usuario
+				if(alugueis.size() > 0) {
+					
+					stmt = this.connection.prepareStatement("DELETE FROM alugueis WHERE idDoCliente = ?");
+					stmt.setInt(1, idDoCliente);
+					
+					
+					stmt.executeUpdate();
+
+				}
+				
+				// Deleta o usuario
+				stmt = this.connection.prepareStatement("DELETE FROM clientes WHERE id = ?");
+				stmt.setInt(1, idDoCliente);
+				
+				int ok = stmt.executeUpdate();
+				
+				// Confirmando que excluiu o usuario
+				if(ok > 0)
+					return true;
+				
+				
+			}
+			
+			
+		
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		// Significa que nao excluiu o cliente por que tem aluguel pendente
+		// Ou algum problema
+		return false;	
+	}
+	
+	
 }
